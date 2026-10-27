@@ -1,0 +1,40 @@
+{
+  "name": "converter-hub",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "go": "node scripts/go.mjs",
+    "go:dev": "node scripts/go.mjs --dev",
+    "gen": "node scripts/gen-registry.mjs",
+    "predev": "npm run gen",
+    "dev": "next dev",
+    "prebuild": "npm run gen",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "ffmpeg": "node scripts/get-ffmpeg.mjs"
+  },
+  "dependencies": {
+    "motion": "^13.1.1",
+    "next": "^15.5.4",
+    "pdfjs-dist": "^6.2.108",
+    "qrcode": "^1.5.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "server-only": "^0.0.1",
+    "sharp": "^0.34.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.13",
+    "@types/node": "^22.15.0",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.9.2"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": []
+  }
+}

@@ -1,0 +1,236 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------- tokens ---
+   A dark, near-black ground with translucent surfaces layered on top.
+   Material weight encodes hierarchy: the sidebar is a heavier structural
+   material, controls are lighter and draw the eye. Nothing here is arbitrary —
+   every step exists to separate one layer from the next.
+--------------------------------------------------------------------------- */
+
+@theme {
+  /* Ground and raised surfaces */
+  --color-ground: oklch(0.145 0.006 265);
+  --color-sunken: oklch(0.118 0.006 265);
+  --color-raised: oklch(0.205 0.008 265);
+  --color-raised-hi: oklch(0.245 0.009 265);
+
+  /* Text: three levels, no more. Vibrancy handled per-surface below. */
+  --color-label: oklch(0.97 0.003 265);
+  --color-label-2: oklch(0.72 0.012 265);
+  --color-label-3: oklch(0.56 0.012 265);
+
+  --color-separator: oklch(0.32 0.01 265 / 0.5);
+
+  /* One accent. Blue reads as "system" and never competes with content. */
+  --color-accent: oklch(0.655 0.176 256);
+  --color-accent-hi: oklch(0.72 0.17 256);
+
+  --color-positive: oklch(0.72 0.17 152);
+  --color-caution: oklch(0.79 0.15 82);
+  --color-critical: oklch(0.66 0.2 22);
+
+  /* Springs, as cubic-béziers, for the few things CSS animates.
+     Critically damped by default — settle, never overshoot. */
+  --ease-settle: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+}
+
+/* ------------------------------------------------------------------ base --- */
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-ground);
+  color: var(--color-label);
+  /* The platform font already ships optical sizing and legibility tuning.
+     Overriding it needs a reason, and there isn't one here. */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable Text",
+    "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Focus is a first-class state, not an afterthought. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: color-mix(in oklch, var(--color-accent) 40%, transparent);
+}
+
+/* ------------------------------------------------------------ typography ---
+   Tracking is size-specific: large text reads too loose as it grows, so it
+   tightens; small text needs a little air to stay legible. Leading moves the
+   other way — tight on display, generous on body.
+--------------------------------------------------------------------------- */
+
+@utility type-display {
+  font-size: 1.75rem;
+  line-height: 1.14;
+  letter-spacing: -0.021em;
+  font-weight: 600;
+}
+
+@utility type-title {
+  font-size: 1.0625rem;
+  line-height: 1.3;
+  letter-spacing: -0.011em;
+  font-weight: 600;
+}
+
+@utility type-body {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+
+@utility type-caption {
+  font-size: 0.75rem;
+  line-height: 1.45;
+  letter-spacing: 0.005em;
+}
+
+@utility type-section {
+  font-size: 0.6875rem;
+  line-height: 1.3;
+  letter-spacing: 0.055em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+/* Progress readouts must not reflow as digits tick. */
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ------------------------------------------------------------- materials ---
+   Translucent layers with content passing underneath, rather than opaque bars
+   that eat a fixed strip of the window. Bigger surface = thicker material.
+--------------------------------------------------------------------------- */
+
+@utility material-sidebar {
+  background: oklch(0.165 0.007 265 / 0.72);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+}
+
+@utility material-bar {
+  background: oklch(0.16 0.006 265 / 0.68);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
+/* A lighter material for interactive surfaces — never stacked on another
+   translucent layer, which would collapse legibility. */
+@utility material-control {
+  background: oklch(1 0 0 / 0.05);
+  border: 1px solid oklch(1 0 0 / 0.09);
+}
+
+/* Where floating chrome overlaps scrolling content, fade the edge instead of
+   drawing a hard 1px rule. */
+@utility scroll-edge {
+  background: linear-gradient(
+    to bottom,
+    var(--color-ground) 0%,
+    color-mix(in oklch, var(--color-ground) 60%, transparent) 55%,
+    transparent 100%
+  );
+}
+
+/* --------------------------------------------------------------- response ---
+   Feedback lives on pointer-down. Waiting for the click to land reads as dead.
+--------------------------------------------------------------------------- */
+
+@utility press {
+  transition:
+    transform 120ms var(--ease-settle),
+    background-color 120ms var(--ease-settle),
+    border-color 120ms var(--ease-settle),
+    color 120ms var(--ease-settle);
+
+  &:active {
+    transform: scale(0.97);
+    transition-duration: 80ms;
+  }
+}
+
+@utility press-sm {
+  transition:
+    transform 120ms var(--ease-settle),
+    background-color 120ms var(--ease-settle),
+    border-color 120ms var(--ease-settle),
+    color 120ms var(--ease-settle);
+
+  &:active {
+    transform: scale(0.985);
+    transition-duration: 80ms;
+  }
+}
+
+/* ---------------------------------------------------------- accessibility ---
+   Reduced motion is not "no feedback" — it is a gentler, non-vestibular
+   equivalent. Transparency and contrast preferences are honoured separately.
+--------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .press:active,
+  .press-sm:active {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .material-sidebar {
+    background: oklch(0.175 0.007 265);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .material-bar {
+    background: var(--color-ground);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .material-sidebar,
+  .material-bar {
+    background: oklch(0.13 0.006 265);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .material-control {
+    background: oklch(0.19 0.008 265);
+    border-color: oklch(0.62 0.014 265);
+  }
+
+  body {
+    --color-label-2: oklch(0.86 0.01 265);
+    --color-label-3: oklch(0.74 0.012 265);
+    --color-separator: oklch(0.6 0.014 265 / 0.9);
+  }
+}
+
+/* --------------------------------------------------------------- scrollbar */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(1 0 0 / 0.16) transparent;
+}
